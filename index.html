@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>White Paper Designer</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body {margin:0; font-family:'Roboto',sans-serif; display:flex; height:100vh; background:#f0f2f5;}
+#toolbar {width:320px; background:#fff; padding:20px; display:flex; flex-direction:column; gap:12px; box-shadow:2px 0 20px rgba(0,0,0,0.1); border-radius:0 12px 12px 0; overflow-y:auto;}
+#toolbar h2 {text-align:center; margin:0 0 12px; font-weight:700; color:#333;}
+#toolbar label {font-weight:500; color:#555;}
+#toolbar input, #toolbar select, #toolbar button {width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; font-size:14px;}
+#toolbar button {background:#2196F3; color:#fff; border:none; font-weight:500; cursor:pointer; transition:0.2s;}
+#toolbar button:hover { background:#1976D2; }
+#styleButtons {display:flex; gap:6px;}
+#styleButtons button {flex:1; padding:8px; font-weight:700;}
+#stickerContainer {display:flex; flex-wrap:wrap; gap:8px; justify-content:center;}
+.sticker {width:50px; height:50px; cursor:pointer; border:1px solid #ccc; border-radius:6px; display:flex; justify-content:center; align-items:center; font-size:24px; background:#fafafa;}
+#canvasWrap {flex:1; display:flex; justify-content:center; align-items:center; position:relative; background:#fff; margin:20px; border-radius:12px; box-shadow:0 10px 25px rgba(0,0,0,0.08);}
+canvas {border-radius:12px; max-width:100%; max-height:100%; touch-action:none;}
+@media(max-width:768px){body{flex-direction:column;} #toolbar{width:100%; border-radius:0 0 12px 12px;}}
+</style>
+</head>
+<body>
+
+<div id="toolbar">
+<h2>White Paper Designer</h2>
+
+<label>Text Options</label>
+<input type="text" id="userText" placeholder="Enter text">
+<input type="number" id="textSize" value="50" placeholder="Font size">
+<input type="color" id="textColor" value="#000000">
+<select id="textFont">
+<option value="Arial">Arial</option>
+<option value="Roboto">Roboto</option>
+<option value="Comic Neue">Comic Neue</option>
+</select>
+<div id="styleButtons">
+<button onclick="toggleStyle('bold')">B</button>
+<button onclick="toggleStyle('italic')">I</button>
+<button onclick="toggleStyle('underline')">U</button>
+</div>
+<button onclick="addText()">Add Text</button>
+
+<label>Upload Image / Sticker</label>
+<input type="file" id="imgPicker" accept="image/*">
+<div id="stickerContainer">
+<div class="sticker" onclick="addSticker('⭐')">⭐</div>
+<div class="sticker" onclick="addSticker('❤️')">❤️</div>
+<div class="sticker" onclick="addSticker('🔥')">🔥</div>
+<div class="sticker" onclick="addSticker('🎉')">🎉</div>
+<div class="sticker" onclick="addSticker('💡')">💡</div>
+</div>
+
+<button onclick="deleteSelected()">Delete Selected</button>
+<button onclick="bringForward()">Bring Forward</button>
+<button onclick="sendBackward()">Send Backward</button>
+<button onclick="undo()">Undo</button>
+<button onclick="redo()">Redo</button>
+<button onclick="downloadImage()">Download PNG</button>
+</div>
+
+<div id="canvasWrap">
+<canvas id="paperCanvas" width="600" height="800"></canvas>
+</div>
+
+<script>
+const canvas = document.getElementById("paperCanvas");
+const ctx = canvas.getContext("2d");
+let objects=[], history=[], redoStack=[], selectedIndex=null, dragging=false, scaling=false, rotating=false;
+let offsetX=0, offsetY=0, startAngle=0, currentStyles={bold:false, italic:false, underline:false};
+const HANDLE_SIZE=12;
+
+// Resize
+function resizeCanvas(){ 
+  const wrap=document.getElementById("canvasWrap"); 
+  canvas.width=wrap.clientWidth-40; 
+  canvas.height=wrap.clientHeight-40; 
+  drawCanvas(); 
+}
+window.addEventListener("resize", resizeCanvas); 
+resizeCanvas();
+
+// History
+function saveHistory(){ history.push(JSON.stringify(objects)); if(history.length>50) history.shift(); }
+function undo(){ if(history.length>0){ redoStack.push(JSON.stringify(objects)); objects=JSON.parse(history.pop()); selectedIndex=null; drawCanvas(); } }
+function redo(){ if(redoStack.length>0){ history.push(JSON.stringify(objects)); objects=JSON.parse(redoStack.pop()); drawCanvas(); } }
+
+// Draw canvas
+function drawCanvas(){
+ctx.clearRect(0,0,canvas.width,canvas.height);
+ctx.fillStyle="#ffffff"; 
+ctx.fillRect(0,0,canvas.width,canvas.height);
+
+objects.forEach((obj,i)=>{
+ctx.save(); ctx.translate(obj.x,obj.y); ctx.rotate((obj.rotation||0)*Math.PI/180); ctx.scale(obj.scale||1,obj.scale||1);
+if(obj.type==="text"||obj.type==="sticker"){ 
+  let style=""; if(obj.bold) style+="bold "; if(obj.italic) style+="italic ";
+  ctx.font=style+(obj.size||50)+"px "+(obj.font||"Arial"); 
+  ctx.fillStyle=obj.color||"#000";
+  ctx.textAlign="center"; ctx.textBaseline="middle"; 
+  ctx.fillText(obj.text,0,0);
+  if(obj.underline){ let w=ctx.measureText(obj.text).width; ctx.beginPath(); ctx.moveTo(-w/2,(obj.size||50)/2); ctx.lineTo(w/2,(obj.size||50)/2); ctx.lineWidth=2; ctx.strokeStyle=obj.color||"#000"; ctx.stroke(); }
+}else if(obj.type==="image"){ ctx.drawImage(obj.img,-obj.width/2,-obj.height/2,obj.width,obj.height); }
+ctx.restore();
+
+// Selection handles
+if(i===selectedIndex){
+  ctx.save(); ctx.strokeStyle="#2196F3"; ctx.setLineDash([6,4]);
+  let w=obj.type==="text"||obj.type==="sticker"?ctx.measureText(obj.text).width:obj.width;
+  let h=obj.type==="text"||obj.type==="sticker"?obj.size:obj.height;
+  ctx.strokeRect(obj.x-w/2-12,obj.y-h/2-12,w+24,h+24);
+  ctx.setLineDash([]);
+  [[-1,-1],[1,-1],[1,1],[-1,1]].forEach(([hx,hy])=>{ 
+    ctx.fillStyle="#2196F3"; 
+    ctx.fillRect(obj.x+hx*(w/2+12)-HANDLE_SIZE/2,obj.y+hy*(h/2+12)-HANDLE_SIZE/2,HANDLE_SIZE,HANDLE_SIZE); 
+  });
+  ctx.fillStyle="#FF5722"; ctx.beginPath(); ctx.arc(obj.x,obj.y-h/2-20,HANDLE_SIZE/2,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+}
+});
+}
+
+// Text/Sticker/Image functions
+function addText(){ 
+  const txt=document.getElementById("userText").value.trim(); 
+  if(!txt) return;
+  const size=parseInt(document.getElementById("textSize").value)||50;
+  const color=document.getElementById("textColor").value;
+  const font=document.getElementById("textFont").value;
+  saveHistory(); 
+  objects.push({type:'text',text:txt,x:canvas.width/2,y:canvas.height/2,size:size,color:color,font:font,...currentStyles,rotation:0,scale:1}); 
+  selectedIndex=objects.length-1; drawCanvas(); 
+}
+
+function addSticker(s){ 
+  saveHistory(); 
+  objects.push({type:'sticker',text:s,x:canvas.width/2,y:canvas.height/2,size:60,rotation:0,scale:1}); 
+  selectedIndex=objects.length-1; drawCanvas(); 
+}
+
+document.getElementById("imgPicker").addEventListener("change",e=>{ 
+  const file=e.target.files[0]; 
+  if(!file) return;
+  const img=new Image(); 
+  img.onload=function(){ 
+    saveHistory(); 
+    let scale=Math.min(canvas.width,img.width)/2/img.width; 
+    objects.push({type:'image',img:img,x:canvas.width/2,y:canvas.height/2,width:img.width*scale,height:img.height*scale,rotation:0,scale:1}); 
+    selectedIndex=objects.length-1; drawCanvas(); 
+  }; 
+  img.src=URL.createObjectURL(file); 
+});
+
+// Drag/Scale/Rotate
+canvas.addEventListener("pointerdown", startDrag);
+canvas.addEventListener("pointermove", drag);
+canvas.addEventListener("pointerup", endDrag);
+
+function getPos(e){ const rect=canvas.getBoundingClientRect(); return {x:e.clientX-rect.left, y:e.clientY-rect.top}; }
+
+function startDrag(e){
+const pos=getPos(e); selectedIndex=null; dragging=false; scaling=false; rotating=false;
+for(let i=objects.length-1;i>=0;i--){
+  let obj=objects[i];
+  let w=obj.type==="text"||obj.type==="sticker"?ctx.measureText(obj.text).width:obj.width;
+  let h=obj.type==="text"||obj.type==="sticker"?obj.size:obj.height;
+  if(Math.hypot(pos.x-obj.x,pos.y-(obj.y-h/2-20))<HANDLE_SIZE){ selectedIndex=i; rotating=true; startAngle=Math.atan2(pos.y-obj.y,pos.x-obj.x)-obj.rotation*Math.PI/180; return; }
+  const corners=[[-1,-1],[1,-1],[1,1],[-1,1]];
+  for(let c=0;c<4;c++){ let hx=obj.x+corners[c][0]*(w/2+12); let hy=obj.y+corners[c][1]*(h/2+12); if(Math.abs(pos.x-hx)<HANDLE_SIZE && Math.abs(pos.y-hy)<HANDLE_SIZE){ selectedIndex=i; scaling=true; offsetX=pos.x-obj.x; offsetY=pos.y-obj.y; return; } }
+  if(pos.x>obj.x-w/2 && pos.x<obj.x+w/2 && pos.y>obj.y-h/2 && pos.y<obj.y+h/2){ selectedIndex=i; dragging=true; offsetX=pos.x-obj.x; offsetY=pos.y-obj.y; return; }
+}
+}
+
+function drag(e){
+if(selectedIndex===null) return;
+const pos=getPos(e); let obj=objects[selectedIndex];
+if(dragging){ obj.x=pos.x-offsetX; obj.y=pos.y-offsetY; }
+if(scaling){ let dx=pos.x-obj.x; let dy=pos.y-obj.y; obj.scale=Math.sqrt(dx*dx+dy*dy)/50; }
+if(rotating){ let angle=Math.atan2(pos.y-obj.y,pos.x-obj.x); obj.rotation=(angle-startAngle)*180/Math.PI; }
+drawCanvas();
+}
+
+function endDrag(){ dragging=false; scaling=false; rotating=false; }
+
+// Actions
+function deleteSelected(){ if(selectedIndex!==null){ saveHistory(); objects.splice(selectedIndex,1); selectedIndex=null; drawCanvas(); } }
+function bringForward(){ if(selectedIndex!==null && selectedIndex<objects.length-1){ saveHistory(); [objects[selectedIndex],objects[selectedIndex+1]]=[objects[selectedIndex+1],objects[selectedIndex]]; selectedIndex++; drawCanvas(); } }
+function sendBackward(){ if(selectedIndex!==null && selectedIndex>0){ saveHistory(); [objects[selectedIndex],objects[selectedIndex-1]]=[objects[selectedIndex-1],objects[selectedIndex]]; selectedIndex--; drawCanvas(); } }
+function downloadImage(){ const link=document.createElement("a"); link.download="design.png"; link.href=canvas.toDataURL("image/png"); link.click(); }
+function toggleStyle(style){ currentStyles[style]=!currentStyles[style]; if(selectedIndex!==null && objects[selectedIndex].type==="text"){ objects[selectedIndex][style]=currentStyles[style]; drawCanvas(); } }
+
+drawCanvas();
+</script>
+</body>
+</html>
