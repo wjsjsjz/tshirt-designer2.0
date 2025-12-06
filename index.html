@@ -2,49 +2,68 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>White Paper Designer</title>
+<title>Professional T-Shirt Designer</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Montserrat:wght@400;700&family=Comic+Neue&family=Pacifico&family=Indie+Flower&display=swap" rel="stylesheet">
 <style>
-body {margin:0; font-family:'Roboto',sans-serif; display:flex; height:100vh; background:#f0f2f5;}
-#toolbar {width:320px; background:#fff; padding:20px; display:flex; flex-direction:column; gap:12px; box-shadow:2px 0 20px rgba(0,0,0,0.1); border-radius:0 12px 12px 0; overflow-y:auto;}
-#toolbar h2 {text-align:center; margin:0 0 12px; font-weight:700; color:#333;}
-#toolbar label {font-weight:500; color:#555;}
-#toolbar input, #toolbar select, #toolbar button {width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; font-size:14px;}
-#toolbar button {background:#2196F3; color:#fff; border:none; font-weight:500; cursor:pointer; transition:0.2s;}
-#toolbar button:hover { background:#1976D2; }
-#styleButtons {display:flex; gap:6px;}
-#styleButtons button {flex:1; padding:8px; font-weight:700;}
-#stickerContainer {display:flex; flex-wrap:wrap; gap:8px; justify-content:center;}
-.sticker {width:50px; height:50px; cursor:pointer; border:1px solid #ccc; border-radius:6px; display:flex; justify-content:center; align-items:center; font-size:24px; background:#fafafa;}
-#canvasWrap {flex:1; display:flex; justify-content:center; align-items:center; position:relative; background:#fff; margin:20px; border-radius:12px; box-shadow:0 10px 25px rgba(0,0,0,0.08);}
-canvas {border-radius:12px; max-width:100%; max-height:100%; touch-action:none;}
-@media(max-width:768px){body{flex-direction:column;} #toolbar{width:100%; border-radius:0 0 12px 12px;}}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Roboto',sans-serif;background:#f0f2f5;display:flex;flex-direction:row;}
+#sidebar{width:320px;background:#fff;padding:20px;box-shadow:2px 0 20px rgba(0,0,0,0.08);overflow-y:auto;height:100vh;display:flex;flex-direction:column;gap:10px;border-radius:15px;}
+#sidebar h2{text-align:center;margin-bottom:10px;font-family:'Montserrat',sans-serif;}
+#sidebar label{font-weight:500;margin-top:8px;display:block;}
+#sidebar input,#sidebar select,#sidebar button{width:100%;padding:8px;margin-top:4px;border-radius:8px;border:1px solid #ccc;font-size:14px;}
+#sidebar button{background:#2196F3;color:#fff;border:none;cursor:pointer;}
+#sidebar button:hover{background:#1976D2;}
+#styleButtons{display:flex;gap:5px;margin-top:5px;}
+#styleButtons button{flex:1;padding:6px;font-weight:700;border-radius:6px;background:#e0f0ff;color:#333;}
+#styleButtons button.active{background:#2196F3;color:#fff;}
+#stickerContainer{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-height:120px;overflow-y:auto;}
+.sticker{width:48px;height:48px;cursor:pointer;border:1px solid #ccc;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;background:#fafafa;}
+.sticker:hover{background:#e0f0ff;}
+#topbar{position:fixed;top:0;left:320px;right:0;height:50px;background:#fff;display:flex;align-items:center;padding:0 20px;box-shadow:0 2px 10px rgba(0,0,0,0.1);}
+#topbar button{height:36px;background:#4CAF50;color:#fff;border:none;border-radius:8px;cursor:pointer;margin-right:10px;}
+#topbar button:hover{background:#388E3C;}
+#canvasWrap{flex:1;margin-left:320px;margin-top:50px;display:flex;justify-content:center;align-items:center;padding:20px;}
+canvas{border-radius:12px;background:#fff;box-shadow:0 15px 30px rgba(0,0,0,0.08);touch-action:none;max-width:100%;max-height:calc(100vh - 80px);}
+#layerPanel{margin-top:10px;background:#fafafa;padding:8px;border-radius:8px;max-height:200px;overflow-y:auto;}
+.layerItem{display:flex;justify-content:space-between;align-items:center;padding:4px 6px;border-bottom:1px solid #ddd;cursor:pointer;border-radius:6px;}
+.layerItem.selected{background:#e0f0ff;}
+.layerItem button{margin-left:5px;background:#f44336;color:#fff;border:none;border-radius:6px;padding:2px 6px;cursor:pointer;}
 </style>
 </head>
 <body>
 
-<div id="toolbar">
-<h2>White Paper Designer</h2>
+<div id="sidebar">
+<h2>T-Shirt Designer</h2>
+
+<label>T-Shirt Color</label>
+<input type="color" id="shirtColor" value="#ffffff">
 
 <label>Text Options</label>
 <input type="text" id="userText" placeholder="Enter text">
-<input type="number" id="textSize" value="50" placeholder="Font size">
+<input type="number" id="textSize" value="50">
 <input type="color" id="textColor" value="#000000">
 <select id="textFont">
 <option value="Arial">Arial</option>
 <option value="Roboto">Roboto</option>
+<option value="Montserrat">Montserrat</option>
 <option value="Comic Neue">Comic Neue</option>
+<option value="Pacifico">Pacifico</option>
+<option value="Indie Flower">Indie Flower</option>
 </select>
 <div id="styleButtons">
 <button onclick="toggleStyle('bold')">B</button>
 <button onclick="toggleStyle('italic')">I</button>
 <button onclick="toggleStyle('underline')">U</button>
+<button onclick="toggleStyle('strikethrough')">S</button>
+<button onclick="toggleStyle('shadow')">Shadow</button>
 </div>
 <button onclick="addText()">Add Text</button>
 
-<label>Upload Image / Sticker</label>
+<label>Upload Image</label>
 <input type="file" id="imgPicker" accept="image/*">
+
+<label>Stickers</label>
 <div id="stickerContainer">
 <div class="sticker" onclick="addSticker('⭐')">⭐</div>
 <div class="sticker" onclick="addSticker('❤️')">❤️</div>
@@ -53,145 +72,205 @@ canvas {border-radius:12px; max-width:100%; max-height:100%; touch-action:none;}
 <div class="sticker" onclick="addSticker('💡')">💡</div>
 </div>
 
+<label>Draw Tool</label>
+<select id="brushType">
+  <option value="pencil">Pencil</option>
+  <option value="marker">Marker</option>
+  <option value="spray">Spray</option>
+  <option value="eraser">Eraser</option>
+</select>
+<input type="color" id="drawColor" value="#000000">
+<input type="number" id="drawSize" value="5" min="1" max="50">
+<input type="range" id="drawOpacity" min="0.1" max="1" step="0.05" value="1">
+<div style="display:flex;gap:5px;margin-top:5px;">
+  <button onclick="toggleDrawing()">Toggle Draw Mode</button>
+  <button onclick="undoDraw()">Undo</button>
+</div>
+
 <button onclick="deleteSelected()">Delete Selected</button>
 <button onclick="bringForward()">Bring Forward</button>
 <button onclick="sendBackward()">Send Backward</button>
-<button onclick="undo()">Undo</button>
-<button onclick="redo()">Redo</button>
+
+<label>Layers</label>
+<div id="layerPanel"></div>
+</div>
+
+<div id="topbar">
 <button onclick="downloadImage()">Download PNG</button>
 </div>
 
 <div id="canvasWrap">
-<canvas id="paperCanvas" width="600" height="800"></canvas>
+<canvas id="shirtCanvas" width="500" height="600"></canvas>
 </div>
 
 <script>
-const canvas = document.getElementById("paperCanvas");
-const ctx = canvas.getContext("2d");
-let objects=[], history=[], redoStack=[], selectedIndex=null, dragging=false, scaling=false, rotating=false;
-let offsetX=0, offsetY=0, startAngle=0, currentStyles={bold:false, italic:false, underline:false};
-const HANDLE_SIZE=12;
+const canvas=document.getElementById("shirtCanvas");
+const ctx=canvas.getContext("2d");
 
-// Resize
-function resizeCanvas(){ 
-  const wrap=document.getElementById("canvasWrap"); 
-  canvas.width=wrap.clientWidth-40; 
-  canvas.height=wrap.clientHeight-40; 
-  drawCanvas(); 
+let objects=[],selectedIndex=null;
+let dragging=false,offsetX=0,offsetY=0;
+let drawMode=false,painting=false;
+let drawObjects=[];
+let currentStyles={bold:false,italic:false,underline:false,strikethrough:false,shadow:false};
+let lastTouchDistance=null,lastTouchAngle=null,initialScale=1,initialRotation=0;
+let rotating=false,lastX=0;
+
+// --- T-shirt Path ---
+function tshirtPath(ctx){
+  const w=canvas.width,h=canvas.height;
+  ctx.beginPath();
+  ctx.moveTo(w*0.2,h*0.1);
+  ctx.quadraticCurveTo(w*0.1,h*0.05,w*0.3,h*0.2);
+  ctx.lineTo(w*0.7,h*0.2);
+  ctx.quadraticCurveTo(w*0.9,h*0.05,w*0.8,h*0.1);
+  ctx.lineTo(w*0.8,h*0.9);
+  ctx.lineTo(w*0.2,h*0.9);
+  ctx.closePath();
 }
-window.addEventListener("resize", resizeCanvas); 
-resizeCanvas();
 
-// History
-function saveHistory(){ history.push(JSON.stringify(objects)); if(history.length>50) history.shift(); }
-function undo(){ if(history.length>0){ redoStack.push(JSON.stringify(objects)); objects=JSON.parse(history.pop()); selectedIndex=null; drawCanvas(); } }
-function redo(){ if(redoStack.length>0){ history.push(JSON.stringify(objects)); objects=JSON.parse(redoStack.pop()); drawCanvas(); } }
-
-// Draw canvas
+// --- Draw Canvas ---
 function drawCanvas(){
-ctx.clearRect(0,0,canvas.width,canvas.height);
-ctx.fillStyle="#ffffff"; 
-ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle=document.getElementById("shirtColor").value;
+  tshirtPath(ctx); ctx.fill();
+  ctx.save(); tshirtPath(ctx); ctx.clip();
 
-objects.forEach((obj,i)=>{
-ctx.save(); ctx.translate(obj.x,obj.y); ctx.rotate((obj.rotation||0)*Math.PI/180); ctx.scale(obj.scale||1,obj.scale||1);
-if(obj.type==="text"||obj.type==="sticker"){ 
-  let style=""; if(obj.bold) style+="bold "; if(obj.italic) style+="italic ";
-  ctx.font=style+(obj.size||50)+"px "+(obj.font||"Arial"); 
-  ctx.fillStyle=obj.color||"#000";
-  ctx.textAlign="center"; ctx.textBaseline="middle"; 
-  ctx.fillText(obj.text,0,0);
-  if(obj.underline){ let w=ctx.measureText(obj.text).width; ctx.beginPath(); ctx.moveTo(-w/2,(obj.size||50)/2); ctx.lineTo(w/2,(obj.size||50)/2); ctx.lineWidth=2; ctx.strokeStyle=obj.color||"#000"; ctx.stroke(); }
-}else if(obj.type==="image"){ ctx.drawImage(obj.img,-obj.width/2,-obj.height/2,obj.width,obj.height); }
-ctx.restore();
-
-// Selection handles
-if(i===selectedIndex){
-  ctx.save(); ctx.strokeStyle="#2196F3"; ctx.setLineDash([6,4]);
-  let w=obj.type==="text"||obj.type==="sticker"?ctx.measureText(obj.text).width:obj.width;
-  let h=obj.type==="text"||obj.type==="sticker"?obj.size:obj.height;
-  ctx.strokeRect(obj.x-w/2-12,obj.y-h/2-12,w+24,h+24);
-  ctx.setLineDash([]);
-  [[-1,-1],[1,-1],[1,1],[-1,1]].forEach(([hx,hy])=>{ 
-    ctx.fillStyle="#2196F3"; 
-    ctx.fillRect(obj.x+hx*(w/2+12)-HANDLE_SIZE/2,obj.y+hy*(h/2+12)-HANDLE_SIZE/2,HANDLE_SIZE,HANDLE_SIZE); 
+  objects.forEach((obj,i)=>{
+    ctx.save(); ctx.translate(obj.x,obj.y); ctx.rotate((obj.rotation||0)*Math.PI/180); ctx.scale(obj.scale||1,obj.scale||1);
+    if(obj.type==="text"||obj.type==="sticker"){
+      let style=""; if(obj.bold)style+="bold "; if(obj.italic)style+="italic ";
+      ctx.font=style+(obj.size||50)+"px "+(obj.font||"Arial"); ctx.textAlign="center"; ctx.textBaseline="middle";
+      ctx.fillStyle=obj.color||"#000"; if(obj.shadow){ctx.shadowColor="rgba(0,0,0,0.3)";ctx.shadowOffsetX=3;ctx.shadowOffsetY=3;ctx.shadowBlur=4;}
+      ctx.fillText(obj.text,0,0); ctx.shadowColor="transparent";
+    } else if(obj.type==="image"){ctx.drawImage(obj.img,-obj.width/2,-obj.height/2,obj.width,obj.height);}
+    else if(obj.type==="draw"){obj.path.forEach(seg=>{ctx.strokeStyle=seg.color;ctx.globalAlpha=seg.opacity;ctx.lineWidth=seg.size;ctx.lineCap=seg.style;ctx.beginPath();ctx.moveTo(seg.x1,seg.y1);ctx.lineTo(seg.x2,seg.y2);ctx.stroke();ctx.globalAlpha=1;});}
+    ctx.restore();
   });
-  ctx.fillStyle="#FF5722"; ctx.beginPath(); ctx.arc(obj.x,obj.y-h/2-20,HANDLE_SIZE/2,0,Math.PI*2); ctx.fill();
   ctx.restore();
-}
-});
+  updateLayers();
 }
 
-// Text/Sticker/Image functions
-function addText(){ 
-  const txt=document.getElementById("userText").value.trim(); 
-  if(!txt) return;
+// --- Constrain ---
+function constrainToTshirt(obj){
+  const w=canvas.width,h=canvas.height;
+  let minX=w*0.2,maxX=w*0.8,minY=h*0.1,maxY=h*0.9;
+  obj.x=Math.min(Math.max(obj.x,minX),maxX);
+  obj.y=Math.min(Math.max(obj.y,minY),maxY);
+}
+
+// --- Add Text/Sticker/Image ---
+function addText(){
+  const txt=document.getElementById("userText").value.trim(); if(!txt)return;
   const size=parseInt(document.getElementById("textSize").value)||50;
   const color=document.getElementById("textColor").value;
   const font=document.getElementById("textFont").value;
-  saveHistory(); 
-  objects.push({type:'text',text:txt,x:canvas.width/2,y:canvas.height/2,size:size,color:color,font:font,...currentStyles,rotation:0,scale:1}); 
-  selectedIndex=objects.length-1; drawCanvas(); 
+  objects.push({type:'text',text:txt,x:canvas.width/2,y:canvas.height/2,size:size,color:color,font:font,...currentStyles,rotation:0,scale:1});
+  selectedIndex=objects.length-1; drawCanvas();
 }
-
-function addSticker(s){ 
-  saveHistory(); 
-  objects.push({type:'sticker',text:s,x:canvas.width/2,y:canvas.height/2,size:60,rotation:0,scale:1}); 
-  selectedIndex=objects.length-1; drawCanvas(); 
-}
-
-document.getElementById("imgPicker").addEventListener("change",e=>{ 
-  const file=e.target.files[0]; 
-  if(!file) return;
-  const img=new Image(); 
-  img.onload=function(){ 
-    saveHistory(); 
-    let scale=Math.min(canvas.width,img.width)/2/img.width; 
-    objects.push({type:'image',img:img,x:canvas.width/2,y:canvas.height/2,width:img.width*scale,height:img.height*scale,rotation:0,scale:1}); 
-    selectedIndex=objects.length-1; drawCanvas(); 
-  }; 
-  img.src=URL.createObjectURL(file); 
+function addSticker(s){objects.push({type:'sticker',text:s,x:canvas.width/2,y:canvas.height/2,size:60,rotation:0,scale:1});selectedIndex=objects.length-1; drawCanvas();}
+document.getElementById("imgPicker").addEventListener("change",e=>{
+  const file=e.target.files[0]; if(!file)return;
+  const img=new Image(); img.onload=function(){
+    let scale=Math.min(canvas.width,img.width)/2/img.width;
+    objects.push({type:'image',img:img,x:canvas.width/2,y:canvas.height/2,width:img.width*scale,height:img.height*scale,rotation:0,scale:1});
+    selectedIndex=objects.length-1; drawCanvas();
+  };
+  img.src=URL.createObjectURL(file);
 });
 
-// Drag/Scale/Rotate
-canvas.addEventListener("pointerdown", startDrag);
-canvas.addEventListener("pointermove", drag);
-canvas.addEventListener("pointerup", endDrag);
+// --- Layers ---
+function updateLayers(){
+  const panel=document.getElementById("layerPanel"); panel.innerHTML="";
+  objects.forEach((obj,i)=>{
+    const div=document.createElement("div"); div.className="layerItem"; if(selectedIndex===i)div.classList.add("selected");
+    div.textContent=obj.type.charAt(0).toUpperCase()+obj.type.slice(1);
+    let delBtn=document.createElement("button"); delBtn.textContent="X"; delBtn.onclick=(e)=>{e.stopPropagation();objects.splice(i,1);selectedIndex=null;drawCanvas();};
+    div.appendChild(delBtn); div.onclick=()=>{selectedIndex=i;drawCanvas();};
+    panel.prepend(div);
+  });
+}
 
-function getPos(e){ const rect=canvas.getBoundingClientRect(); return {x:e.clientX-rect.left, y:e.clientY-rect.top}; }
+// --- Actions ---
+function deleteSelected(){if(selectedIndex!==null){objects.splice(selectedIndex,1);selectedIndex=null;drawCanvas();}}
+function bringForward(){if(selectedIndex!==null&&selectedIndex<objects.length-1){[objects[selectedIndex],objects[selectedIndex+1]]=[objects[selectedIndex+1],objects[selectedIndex]];selectedIndex++;drawCanvas();}}
+function sendBackward(){if(selectedIndex!==null&&selectedIndex>0){[objects[selectedIndex],objects[selectedIndex-1]]=[objects[selectedIndex-1],objects[selectedIndex]];selectedIndex--;drawCanvas();}}
+function toggleStyle(style){currentStyles[style]=!currentStyles[style]; if(selectedIndex!==null&&(objects[selectedIndex].type==="text"||objects[selectedIndex].type==="sticker")){objects[selectedIndex][style]=currentStyles[style]; drawCanvas();}}
+
+// --- Drawing Tool ---
+function toggleDrawing(){drawMode=!drawMode; alert(drawMode?"Draw Mode Enabled":"Draw Mode Disabled");}
+function undoDraw(){ 
+  for(let i=objects.length-1;i>=0;i--){
+    if(objects[i].type==="draw"){objects.splice(i,1); drawCanvas(); break;}
+  }
+}
+
+// --- Drag / Draw / Gestures ---
+function getPos(e){const rect=canvas.getBoundingClientRect(); if(e.touches)return {x:e.touches[0].clientX-rect.left,y:e.touches[0].clientY-rect.top}; return {x:e.offsetX,y:e.offsetY};}
+
+canvas.addEventListener("mousedown", startDrag); canvas.addEventListener("touchstart", startDrag);
+canvas.addEventListener("mousemove", dragMove); canvas.addEventListener("touchmove", dragMove);
+canvas.addEventListener("mouseup", endDrag); canvas.addEventListener("touchend", endDrag);
 
 function startDrag(e){
-const pos=getPos(e); selectedIndex=null; dragging=false; scaling=false; rotating=false;
-for(let i=objects.length-1;i>=0;i--){
-  let obj=objects[i];
-  let w=obj.type==="text"||obj.type==="sticker"?ctx.measureText(obj.text).width:obj.width;
-  let h=obj.type==="text"||obj.type==="sticker"?obj.size:obj.height;
-  if(Math.hypot(pos.x-obj.x,pos.y-(obj.y-h/2-20))<HANDLE_SIZE){ selectedIndex=i; rotating=true; startAngle=Math.atan2(pos.y-obj.y,pos.x-obj.x)-obj.rotation*Math.PI/180; return; }
-  const corners=[[-1,-1],[1,-1],[1,1],[-1,1]];
-  for(let c=0;c<4;c++){ let hx=obj.x+corners[c][0]*(w/2+12); let hy=obj.y+corners[c][1]*(h/2+12); if(Math.abs(pos.x-hx)<HANDLE_SIZE && Math.abs(pos.y-hy)<HANDLE_SIZE){ selectedIndex=i; scaling=true; offsetX=pos.x-obj.x; offsetY=pos.y-obj.y; return; } }
-  if(pos.x>obj.x-w/2 && pos.x<obj.x+w/2 && pos.y>obj.y-h/2 && pos.y<obj.y+h/2){ selectedIndex=i; dragging=true; offsetX=pos.x-obj.x; offsetY=pos.y-obj.y; return; }
-}
+  const pos=getPos(e);
+  if(drawMode){painting=true;drawObjects.push({type:'draw',path:[],brush:document.getElementById("brushType").value}); objects.push(drawObjects[drawObjects.length-1]); return;}
+  dragging=false; selectedIndex=null;
+  for(let i=objects.length-1;i>=0;i--){
+    const obj=objects[i]; let w=obj.type==="text"||obj.type==="sticker"?ctx.measureText(obj.text).width:obj.width;
+    let h=obj.type==="text"||obj.type==="sticker"?obj.size:obj.height;
+    if(pos.x>obj.x-w/2&&pos.x<obj.x+w/2&&pos.y>obj.y-h/2&&pos.y<obj.y+h/2){selectedIndex=i; dragging=true; offsetX=pos.x-obj.x; offsetY=pos.y-obj.y; initialScale=obj.scale||1; initialRotation=obj.rotation||0; break;}
+  }
 }
 
-function drag(e){
-if(selectedIndex===null) return;
-const pos=getPos(e); let obj=objects[selectedIndex];
-if(dragging){ obj.x=pos.x-offsetX; obj.y=pos.y-offsetY; }
-if(scaling){ let dx=pos.x-obj.x; let dy=pos.y-obj.y; obj.scale=Math.sqrt(dx*dx+dy*dy)/50; }
-if(rotating){ let angle=Math.atan2(pos.y-obj.y,pos.x-obj.x); obj.rotation=(angle-startAngle)*180/Math.PI; }
-drawCanvas();
+function dragMove(e){
+  const pos=getPos(e);
+  if(drawMode && painting){
+    let drawObj=drawObjects[drawObjects.length-1];
+    const color=document.getElementById("drawColor").value;
+    const size=parseInt(document.getElementById("drawSize").value);
+    const opacity=parseFloat(document.getElementById("drawOpacity").value);
+    const brush=document.getElementById("brushType").value;
+    if(brush==="spray"){
+      for(let i=0;i<10;i++){
+        let offsetX=(Math.random()-0.5)*size*2;
+        let offsetY=(Math.random()-0.5)*size*2;
+        drawObj.path.push({x1:pos.x+offsetX,y1:pos.y+offsetY,x2:pos.x+offsetX+1,y2:pos.y+offsetY+1,color:color,size:1,opacity:opacity,style:"round"});
+      }
+    } else if(brush==="eraser"){
+      drawObj.path.push({x1:pos.x,y1:pos.y,x2:pos.x+1,y2:pos.y+1,color:"#fff",size:size,opacity:1,style:"round"});
+    } else {
+      drawObj.path.push({x1:pos.x,y1:pos.y,x2:pos.x,y2:pos.y,color:color,size:size,opacity:opacity,style:"round"});
+    }
+    drawCanvas(); return;
+  }
+  if(dragging && selectedIndex!==null){objects[selectedIndex].x=pos.x-offsetX; objects[selectedIndex].y=pos.y-offsetY; constrainToTshirt(objects[selectedIndex]); drawCanvas();}
 }
 
-function endDrag(){ dragging=false; scaling=false; rotating=false; }
+function endDrag(){dragging=false;painting=false;rotating=false;}
 
-// Actions
-function deleteSelected(){ if(selectedIndex!==null){ saveHistory(); objects.splice(selectedIndex,1); selectedIndex=null; drawCanvas(); } }
-function bringForward(){ if(selectedIndex!==null && selectedIndex<objects.length-1){ saveHistory(); [objects[selectedIndex],objects[selectedIndex+1]]=[objects[selectedIndex+1],objects[selectedIndex]]; selectedIndex++; drawCanvas(); } }
-function sendBackward(){ if(selectedIndex!==null && selectedIndex>0){ saveHistory(); [objects[selectedIndex],objects[selectedIndex-1]]=[objects[selectedIndex-1],objects[selectedIndex]]; selectedIndex--; drawCanvas(); } }
-function downloadImage(){ const link=document.createElement("a"); link.download="design.png"; link.href=canvas.toDataURL("image/png"); link.click(); }
-function toggleStyle(style){ currentStyles[style]=!currentStyles[style]; if(selectedIndex!==null && objects[selectedIndex].type==="text"){ objects[selectedIndex][style]=currentStyles[style]; drawCanvas(); } }
+// --- Desktop: Mouse wheel scaling ---
+canvas.addEventListener("wheel", e => {
+  e.preventDefault();
+  if(selectedIndex!==null && !drawMode){
+    const obj=objects[selectedIndex];
+    if(e.deltaY<0)obj.scale=(obj.scale||1)*1.05;
+    else obj.scale=(obj.scale||1)/1.05;
+    drawCanvas();
+  }
+});
 
+// --- Desktop: Right-click rotation ---
+canvas.addEventListener("mousedown", e => {if(e.button===2 && selectedIndex!==null){rotating=true;lastX=e.clientX;}});
+canvas.addEventListener("mousemove", e => {if(rotating && selectedIndex!==null){const obj=objects[selectedIndex]; let dx=e.clientX-lastX; obj.rotation=(obj.rotation||0)+dx*0.5; lastX=e.clientX; drawCanvas();}});
+canvas.addEventListener("mouseup", e => {rotating=false;});
+canvas.addEventListener("contextmenu", e => e.preventDefault());
+
+// --- Download ---
+function downloadImage(){const link=document.createElement("a");link.download="tshirt.png";link.href=canvas.toDataURL("image/png");link.click();}
+
+// --- Initial Draw ---
 drawCanvas();
 </script>
+
 </body>
 </html>
